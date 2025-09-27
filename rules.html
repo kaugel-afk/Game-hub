@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GamerHub - Règles</title>
+<style>
+body { margin:0; font-family:'Poppins',sans-serif; background:#1f1c2c; color:#f5f5f5; }
+header { padding:1rem; font-size:1.8rem; font-weight:bold; background:#2b2a40; text-align:center; }
+.container { max-width:700px; margin:1rem auto; padding:0 1rem; display:flex; flex-direction:column; gap:1rem; }
+.rule-card { background:#2b2a40; border-radius:15px; padding:1rem; }
+.rule-card h3 { color:#6c5ce7; margin-bottom:0.5rem; }
+.bottom-nav { position:fixed; bottom:0; left:0; width:100%; background:#2b2a40; display:flex; justify-content:space-around; padding:0.5rem 0; border-top:1px solid #444; }
+.bottom-nav a { flex:1; text-align:center; color:#f5f5f5; font-weight:bold; text-decoration:none; }
+.bottom-nav a:hover { color:#6c5ce7; }
+button { margin-top:0.5rem; padding:0.5rem 1rem; border:none; border-radius:10px; background:#6c5ce7; color:white; cursor:pointer; }
+input { margin-top:0.5rem; padding:0.5rem; border-radius:10px; border:none; width:100%; background:#3a384f; color:white; }
+</style>
+</head>
+<body>
+
+<header>GamerHub - Règles</header>
+
+<div class="container">
+    <div class="rule-card">
+        <h3>1. Respectez les autres</h3>
+        <p>Aucune insulte, harcèlement ou comportement discriminatoire ne sera toléré.</p>
+    </div>
+    <div class="rule-card">
+        <h3>2. Pas de contenu inapproprié</h3>
+        <p>Les publications ou messages à caractère sexuel, violent ou offensant sont interdits.</p>
+    </div>
+    <div class="rule-card">
+        <h3>3. Pas de spam</h3>
+        <p>Évitez de poster plusieurs fois la même chose ou de faire de la publicité non autorisée.</p>
+    </div>
+    <div class="rule-card">
+        <h3>4. Modération</h3>
+        <p>Les admins et modérateurs peuvent bannir temporairement tout utilisateur qui enfreint ces règles.</p>
+    </div>
+
+    <div id="admin-actions" style="display:none;">
+        <h3>🔧 Actions Admin / Modérateur</h3>
+        <input type="text" id="ban-user-id" placeholder="ID utilisateur à bannir">
+        <input type="number" id="ban-duration" placeholder="Durée du ban (minutes)">
+        <button onclick="banUser()">Bannir</button>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+    <a href="home.html">ACCUEIL</a>
+    <a href="forum.html">FORUM</a>
+    <a href="chat.html">CHAT</a>
+    <a href="profil.html">PROFIL</a>
+</nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// Configuration Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAlNL7mff2FJ5E0ODtl-EyO3dk0wLdq5Dk",
+  authDomain: "gamer-hub-bd62e.firebaseapp.com",
+  projectId: "gamer-hub-bd62e",
+  storageBucket: "gamer-hub-bd62e.appspot.com",
+  messagingSenderId: "892321587019",
+  appId: "1:892321587019:web:26373171797453498ed2ce",
+  measurementId: "G-7D1TBYHJKL"
+};
+
+// Initialiser Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser;
+let userData;
+
+// Vérification de l'authentification
+onAuthStateChanged(auth, async user => {
+    if(user){
+        currentUser = user;
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if(docSnap.exists()){
+            userData = docSnap.data();
+            if(userData.role === "admin" || userData.role === "moderator"){
+                document.getElementById("admin-actions").style.display = "block";
+            }
+        }
+    } else {
+        window.location.href = "index.html";
+    }
+});
+
+// Fonction pour bannir un utilisateur
+window.banUser = async function(){
+    const userId = document.getElementById("ban-user-id").value.trim();
+    const duration = parseInt(document.getElementById("ban-duration").value);
+    if(!userId || isNaN(duration)) return alert("Veuillez remplir correctement les champs.");
+    
+    const banUntil = new Date(Date.now() + duration * 60000); // Convertir minutes en ms
+    await setDoc(doc(db, "bans", userId), { bannedUntil });
+    alert(`Utilisateur ${userId} banni pendant ${duration} minutes.`);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GamerHub - Connexion</title>
+<style>
+body { margin:0; font-family:'Poppins',sans-serif; background:#1f1c2c; color:#f5f5f5; display:flex; justify-content:center; align-items:center; height:100vh; }
+.login-card { background:#2b2a40; padding:2rem; border-radius:15px; text-align:center; width:90%; max-width:400px; box-shadow:0 4px 15px rgba(0,0,0,0.5); }
+.login-card h1 { margin-bottom:1rem; color:#6c5ce7; }
+button { padding:0.5rem 1rem; border:none; border-radius:10px; background:#6c5ce7; color:white; cursor:pointer; font-size:1rem; }
+button:hover { background:#5941c7; }
+</style>
+</head>
+<body>
+
+<div class="login-card">
+    <h1>GamerHub</h1>
+    <p>Connectez-vous avec Google pour accéder au site</p>
+    <button id="google-login">Connexion Google</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "TA_API_KEY",
+    authDomain: "TON_PROJECT.firebaseapp.com",
+    projectId: "TON_PROJECT_ID",
+    storageBucket: "TON_PROJECT.appspot.com",
+    messagingSenderId: "TON_MESSAGING_SENDER_ID",
+    appId: "TON_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+document.getElementById("google-login").addEventListener("click", async ()=>{
+    const provider = new GoogleAuthProvider();
+    try{ await signInWithPopup(auth, provider); }catch(e){ console.error(e); }
+});
+
+onAuthStateChanged(auth, user => {
+    if(user) window.location.href = "home.html";
+});
+</script>
+
+</body>
+</html>

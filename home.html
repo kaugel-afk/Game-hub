@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GamerHub - Accueil</title>
+<style>
+body { margin:0; font-family:'Poppins',sans-serif; background:#1f1c2c; color:#f5f5f5; }
+header { padding:1rem; font-size:1.8rem; font-weight:bold; background:#2b2a40; text-align:center; }
+.container { max-width:700px; margin:1rem auto; padding:0 1rem; display:flex; flex-direction:column; gap:1rem; }
+.activity-card { background:#2b2a40; border-radius:15px; padding:1rem; }
+.activity-card img { max-width:100%; border-radius:10px; margin-top:0.5rem; }
+.bottom-nav { position:fixed; bottom:0; left:0; width:100%; background:#2b2a40; display:flex; justify-content:space-around; padding:0.5rem 0; border-top:1px solid #444; }
+.bottom-nav a { flex:1; text-align:center; color:#f5f5f5; font-weight:bold; text-decoration:none; }
+.bottom-nav a:hover { color:#6c5ce7; }
+</style>
+</head>
+<body>
+<header>GamerHub - Accueil</header>
+
+<div class="container">
+    <div class="activity-card">
+        <h3>Bienvenue sur GamerHub !</h3>
+        <p>Partage tes expériences, discute avec la communauté et suis les activités du site.</p>
+        <img src="https://images.unsplash.com/photo-1605902711622-cfb43c4437b1?fit=crop&w=700&q=80" alt="Gaming">
+    </div>
+    <div class="activity-card">
+        <h3>Forum</h3>
+        <p>Publie tes sujets et commente les publications des autres.</p>
+    </div>
+    <div class="activity-card">
+        <h3>Chat global</h3>
+        <p>Discute avec tous les utilisateurs en temps réel.</p>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+    <a href="home.html">ACCUEIL</a>
+    <a href="forum.html">FORUM</a>
+    <a href="chat.html">CHAT</a>
+    <a href="profil.html">PROFIL</a>
+</nav>
+
+</body>
+</html>

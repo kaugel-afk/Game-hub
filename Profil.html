@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GamerHub - Profil</title>
+<style>
+body { margin:0; font-family:'Poppins',sans-serif; background:#1f1c2c; color:#f5f5f5; }
+header { padding:1rem; font-size:1.8rem; font-weight:bold; background:#2b2a40; text-align:center; }
+.container { max-width:700px; margin:1rem auto; padding:0 1rem; display:flex; flex-direction:column; gap:1rem; }
+.profile-card { background:#2b2a40; border-radius:15px; padding:1rem; display:flex; flex-direction:column; align-items:center; gap:0.5rem; }
+.profile-card img { width:100px; height:100px; border-radius:50%; object-fit:cover; }
+.profile-card input, .profile-card textarea { width:100%; padding:0.5rem; border-radius:10px; border:none; background:#3a384f; color:#f5f5f5; margin-top:0.5rem; }
+button { margin-top:0.5rem; padding:0.5rem 1rem; border:none; border-radius:10px; background:#6c5ce7; color:white; cursor:pointer; }
+.bottom-nav { position:fixed; bottom:0; left:0; width:100%; background:#2b2a40; display:flex; justify-content:space-around; padding:0.5rem 0; border-top:1px solid #444; }
+.bottom-nav a { flex:1; text-align:center; color:#f5f5f5; font-weight:bold; text-decoration:none; }
+.bottom-nav a:hover { color:#6c5ce7; }
+</style>
+</head>
+<body>
+
+<header>GamerHub - Profil</header>
+
+<div class="container">
+    <div class="profile-card">
+        <img id="profile-pic" src="https://via.placeholder.com/100" alt="Photo profil">
+        <input type="file" id="profile-file">
+        <input type="text" id="profile-name" placeholder="Nom complet">
+        <input type="number" id="profile-age" placeholder="Âge">
+        <textarea id="profile-info" rows="3" placeholder="Quelques informations..."></textarea>
+        <button onclick="updateProfile()">Mettre à jour</button>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+    <a href="home.html">ACCUEIL</a>
+    <a href="forum.html">FORUM</a>
+    <a href="chat.html">CHAT</a>
+    <a href="profil.html">PROFIL</a>
+</nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+const firebaseConfig = {
+    apiKey: "TA_API_KEY",
+    authDomain: "TON_PROJECT.firebaseapp.com",
+    projectId: "TON_PROJECT_ID",
+    storageBucket: "TON_PROJECT.appspot.com",
+    messagingSenderId: "TON_MESSAGING_SENDER_ID",
+    appId: "TON_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+let currentUser;
+
+onAuthStateChanged(auth, async user => {
+    if(user){
+        currentUser = user;
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if(docSnap.exists()){
+            const data = docSnap.data();
+            document.getElementById("profile-name").value = data.name || "";
+            document.getElementById("profile-age").value = data.age || "";
+            document.getElementById("profile-info").value = data.info || "";
+            if(data.photo) document.getElementById("profile-pic").src = data.photo;
+        }
+    } else {
+        window.location.href = "index.html";
+    }
+});
+
+async function updateProfile(){
+    let photoURL = document.getElementById("profile-pic").src;
+    const file = document.getElementById("profile-file").files[0];
+    if(file){
+        const storageRef = ref(storage, 'profile/'+currentUser.uid);
+        await uploadBytes(storageRef, file);
+        photoURL = await getDownloadURL(storageRef);
+    }
+    await setDoc(doc(db,"users",currentUser.uid),{
+        name: document.getElementById("profile-name").value,
+        age: document.getElementById("profile-age").value,
+        info: document.getElementById("profile-info").value,
+        photo: photoURL
+    });
+    alert("Profil mis à jour !");
+}
+</script>
+
+</body>
+</html>
